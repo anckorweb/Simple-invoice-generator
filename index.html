@@ -26,6 +26,7 @@
                             type="text"
                             class="form-control"
                             placeholder="Concepto"
+                            v-model="item.text"
                         />
                     </div>
                     <div class="form-group col-sm-4">
@@ -82,9 +83,7 @@
                 el: "#app",
                 data: {
                     appTitle: "Generar factura",
-                    conceptList: [
-                        { id: 0, text: "Campo de prueba", value: "" }
-                    ],
+                    conceptList: [{ id: 0, text: "", value: "" }],
                     finalPrice: 0,
                     taxValue: 7
                 },
