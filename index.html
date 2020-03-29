@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Concepto facturador</title>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <div id="app" class="container mt-5">
+            <h2>{{appTitle}}</h2>
+
+            <div>
+                <div
+                    :id="item.id"
+                    v-for="item of conceptList"
+                    class="row col-sm-10 float-left"
+                >
+                    <div class="form-group col-sm-8">
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Concepto"
+                        />
+                    </div>
+                    <div class="form-group col-sm-4">
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Precio"
+                            v-model="item.value"
+                            v-on:keyup="checkFormatNumberConcept(item.id)"
+                        />
+                    </div>
+                </div>
+            </div>
+            <button
+                class="btn btn-primary col-sm-2 float-left"
+                v-on:click="addConcept"
+            >
+                Añadir
+            </button>
+
+            <div class="clearfix"></div>
+
+            <hr />
+
+            <div class="row col-sm-3 float-right">
+                <div class="form-group ">
+                    <p style="position:absolute; left:-80px; top:8px;">
+                        Impuestos
+                    </p>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="IGIC"
+                        v-model="taxValue"
+                        v-on:keyup="checkFormatNumberTax"
+                    />
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <h4 class="text-right">Total: {{calculateTotal}}€</h4>
+            <p
+                v-show="isNaN(this.finalPrice) || this.finalPrice === ''"
+                class="text-right"
+            >
+                Error en los valores
+            </p>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script>
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    appTitle: "Generar factura",
+                    conceptList: [
+                        { id: 0, text: "Campo de prueba", value: "" }
+                    ],
+                    finalPrice: 0,
+                    taxValue: 7
+                },
+                methods: {
+                    addConcept: function(event) {
+                        this.conceptList.push({
+                            id: this.conceptList.length,
+                            text: "",
+                            value: ""
+                        });
+                    },
+
+                    checkFormatNumberConcept: function(idConcept) {
+                        valor = this.conceptList[idConcept].value;
+                        this.conceptList[idConcept].value = valor.replace(
+                            /,/g,
+                            "."
+                        );
+                    },
+
+                    checkFormatNumberTax: function() {
+                        this.taxValue = this.taxValue.replace(/,/g, ".");
+                    }
+                },
+                computed: {
+                    calculateTotal: function(event) {
+                        this.finalPrice = 0;
+
+                        for (item of this.conceptList) {
+                            currentPriceItem = item.value;
+                            if (currentPriceItem == "") {
+                                currentPriceItem = 0;
+                            }
+                            this.finalPrice =
+                                parseFloat(this.finalPrice) +
+                                parseFloat(currentPriceItem);
+                        }
+
+                        this.finalPrice =
+                            this.finalPrice -
+                            (this.finalPrice * this.taxValue) / 100;
+
+                        if (!isNaN(this.finalPrice)) {
+                            return this.finalPrice.toFixed(2);
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
